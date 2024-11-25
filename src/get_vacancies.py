@@ -8,7 +8,6 @@ def get_vacancies():
         employer_json = requests.get(url_1, params=params)
         if employer_json.status_code == 200:
             employers = employer_json.json().get("items")[:10]
-            # return employers
             all_vacancies = []
             if employers:
                 for employer in employers:

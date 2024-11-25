@@ -16,7 +16,10 @@ def vacancies_to_table(vacancies):
             try:
                 cur.execute("DROP TABLE IF EXISTS vacancies;")
                 cur.execute(
-                    "CREATE TABLE vacancies (name_vacancy text not null, location varchar(100) not null, salary_from INT not null, salary_to INT not null, currency varchar(10) not null, url text not null);"
+                    "CREATE TABLE vacancies (name_vacancy text not null, "
+                    "location varchar(100) not null, "
+                    "salary_from INT not null, salary_to INT not null, "
+                    "currency varchar(10) not null, url text not null);"
                 )
                 for vacancy in vacancies:
                     name_vacancy = vacancy["name"]
@@ -33,24 +36,24 @@ def vacancies_to_table(vacancies):
                     )
                     currency = vacancy["salary"]["currency"]
                     url_vacancy = vacancy["alternate_url"]
-                    cur.execute(
-                        "INSERT INTO vacancies VALUES (%s, %s, %s, %s, %s, %s)",
-                        (
-                            name_vacancy,
-                            location,
-                            salary_from,
-                            salary_to,
-                            currency,
-                            url_vacancy,
-                        ),
-                    )
-                    conn.commit()
-                    cur.execute("SELECT * FROM vacancies;")
+                    if True:
+                        cur.execute(
+                            "INSERT INTO vacancies VALUES (%s, %s, %s, %s, %s, %s)",
+                            (
+                                name_vacancy,
+                                location,
+                                salary_from,
+                                salary_to,
+                                currency,
+                                url_vacancy,
+                            ),
+                        )
+                        conn.commit()
+                return "Вакансии добавлены в таблицу"
             except Exception as e:
                 print(e)
                 print("Ошибка в get_vacancies")
                 return []
-        return "Вакансии добавлены в таблицу"
 
 
 if __name__ == "__main__":
