@@ -1,7 +1,10 @@
+from typing import List
+
 import requests
 
 
-def get_vacancies():
+def get_vacancies() -> List:
+    """Функция, получающая вакансии по API"""
     url_1 = "https://api.hh.ru/employers"
     params = {"only_with_vacancies": True}
     try:

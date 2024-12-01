@@ -1,9 +1,12 @@
+from typing import List
+
 import psycopg2
 
 from src.get_vacancies import get_vacancies
 
 
-def vacancies_to_table(vacancies):
+def vacancies_to_table(vacancies: List) -> str:
+    """Функция, добавляющая вакансии в таблицу"""
     conn_params = {
         "host": "localhost",
         "database": "vacancies",
@@ -52,8 +55,7 @@ def vacancies_to_table(vacancies):
                 return "Вакансии добавлены в таблицу"
             except Exception as e:
                 print(e)
-                print("Ошибка в get_vacancies")
-                return []
+                return "Ошибка в get_vacancies"
 
 
 if __name__ == "__main__":
