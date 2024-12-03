@@ -79,10 +79,10 @@ class DBManager(DBConnect):
     ):
         pass
         query = """
-                SELECT * FROM vacancies 
-                WHERE (%s IS NULL OR employer ILIKE %s) 
-                AND (%s IS NULL OR name_vacancy ILIKE %s) 
-                AND (%s IS NULL OR %s BETWEEN salary_from AND salary_to) 
+                SELECT * FROM vacancies
+                WHERE (%s IS NULL OR employer ILIKE %s)
+                AND (%s IS NULL OR name_vacancy ILIKE %s)
+                AND (%s IS NULL OR %s BETWEEN salary_from AND salary_to)
                 AND (%s IS NULL OR url = %s);
                 """
 

@@ -19,25 +19,27 @@ def employers_to_table(employers: List[Dict[str, Optional[str]]]):
     )
 
     cur = conn_params.cursor()
-    try:
-        cur.execute("DROP TABLE IF EXISTS employers CASCADE;")
-        cur.execute(
-            "CREATE TABLE employers (employer varchar(100) PRIMARY KEY not null,"
-            "open_vacancies varchar(100))"
-        )
+    # try:
+    cur.execute("DROP TABLE IF EXISTS employers CASCADE;")
+    cur.execute(
+        "CREATE TABLE employers (employer varchar(100) PRIMARY KEY not null,"
+        "open_vacancies varchar(100))"
+    )
 
-        for employer in employers:
-            name_employer = employer["name"]
-            open_vacancies = employer["open_vacancies"]
-            cur.execute(
-                "INSERT INTO employers VALUES (%s, %s)",
-                (name_employer, open_vacancies),
-            )
-            conn_params.commit()
-        return "Работодатели добавлены в таблицу"
-    except Exception as e:
-        print(e)
-        return "Ошибка в employers_to_table"
+    for employer in employers:
+        name_employer = employer["name"]
+        open_vacancies = employer["open_vacancies"]
+        cur.execute(
+            "INSERT INTO employers VALUES (%s, %s)",
+            (name_employer, open_vacancies),
+        )
+        conn_params.commit()
+        cur.close()
+        conn_params.close()
+    return "Работодатели добавлены в таблицу"
+    # except Exception as e:
+    #     print(e)
+    #     return "Ошибка в employers_to_table"
 
 
 def vacancies_to_table(vacancies: List[dict]) -> str:
@@ -45,15 +47,15 @@ def vacancies_to_table(vacancies: List[dict]) -> str:
     load_dotenv()
     password = os.getenv("DATABASE_PASSWORD")
     conn_params = {
-        "host":"localhost",
-        "database":"vacancies",
-        "user":"postgres",
-        "password":password,
+        "host": "localhost",
+        "database": "vacancies",
+        "user": "postgres",
+        "password": password,
     }
 
     with psycopg2.connect(**conn_params) as conn:
         with conn.cursor() as cur:
-    # cur = conn_params.cursor()
+            # cur = conn_params.cursor()
             try:
                 cur.execute("DROP TABLE IF EXISTS vacancies;")
                 cur.execute(
@@ -74,7 +76,9 @@ def vacancies_to_table(vacancies: List[dict]) -> str:
                         else 0
                     )
                     salary_to = (
-                        vacancy["salary"]["to"] if vacancy["salary"]["to"] is not None else 0
+                        vacancy["salary"]["to"]
+                        if vacancy["salary"]["to"] is not None
+                        else 0
                     )
                     currency = vacancy["salary"]["currency"]
                     url_vacancy = vacancy["alternate_url"]
