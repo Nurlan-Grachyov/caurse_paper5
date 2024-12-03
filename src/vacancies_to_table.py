@@ -19,27 +19,27 @@ def employers_to_table(employers: List[Dict[str, Optional[str]]]):
     )
 
     cur = conn_params.cursor()
-    # try:
-    cur.execute("DROP TABLE IF EXISTS employers CASCADE;")
-    cur.execute(
-        "CREATE TABLE employers (employer varchar(100) PRIMARY KEY not null,"
-        "open_vacancies varchar(100))"
-    )
-
-    for employer in employers:
-        name_employer = employer["name"]
-        open_vacancies = employer["open_vacancies"]
+    try:
+        cur.execute("DROP TABLE IF EXISTS employers CASCADE;")
         cur.execute(
-            "INSERT INTO employers VALUES (%s, %s)",
-            (name_employer, open_vacancies),
+            "CREATE TABLE employers (employer varchar(100) PRIMARY KEY not null,"
+            "open_vacancies varchar(100))"
         )
+
+        for employer in employers:
+            name_employer = employer["name"]
+            open_vacancies = employer["open_vacancies"]
+            cur.execute(
+                "INSERT INTO employers VALUES (%s, %s)",
+                (name_employer, open_vacancies),
+            )
         conn_params.commit()
         cur.close()
         conn_params.close()
-    return "Работодатели добавлены в таблицу"
-    # except Exception as e:
-    #     print(e)
-    #     return "Ошибка в employers_to_table"
+        return "Работодатели добавлены в таблицу"
+    except Exception as e:
+        print(e)
+        return "Ошибка в employers_to_table"
 
 
 def vacancies_to_table(vacancies: List[dict]) -> str:
@@ -94,9 +94,9 @@ def vacancies_to_table(vacancies: List[dict]) -> str:
                             url_vacancy,
                         ),
                     )
-                    conn.commit()
-                    # cur.close()
-                    # conn_params.close()
+                conn.commit()
+                # cur.close()
+                # conn_params.close()
                 return "Вакансии добавлены в таблицу"
             except Exception as e:
                 print(e)
