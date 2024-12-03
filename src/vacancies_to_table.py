@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from src.get_vacancies import get_employers, get_vacancies
 
 
-def employers_to_table(employers: List[Dict[str, Optional[str]]]):
+def employers_to_table(employers: List[dict[str, Optional[str]]]):
     """Функция, добавляющая работодателей в таблицу"""
     load_dotenv()
     password = os.getenv("DATABASE_PASSWORD")
@@ -42,7 +42,7 @@ def employers_to_table(employers: List[Dict[str, Optional[str]]]):
         return "Ошибка в employers_to_table"
 
 
-def vacancies_to_table(vacancies: List[dict]) -> str:
+def vacancies_to_table(vacancies: List[Dict[str, Optional[dict]]]) -> str | None:
     """Функция, добавляющая вакансии в таблицу"""
     load_dotenv()
     password = os.getenv("DATABASE_PASSWORD")
