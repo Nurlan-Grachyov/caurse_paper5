@@ -42,7 +42,8 @@ def employers_to_table(employers: List[dict[str, Optional[str]]]):
         return "Ошибка в employers_to_table"
 
 
-def vacancies_to_table(vacancies: List[Dict[str, Optional[dict]]]) -> str | None:
+# def vacancies_to_table(vacancies: List[Dict[str, Optional[dict]]]) -> str | None:
+def vacancies_to_table(vacancies: List[Dict[str, dict]]) -> str | None:
     """Функция, добавляющая вакансии в таблицу"""
     load_dotenv()
     password = os.getenv("DATABASE_PASSWORD")
@@ -53,7 +54,7 @@ def vacancies_to_table(vacancies: List[Dict[str, Optional[dict]]]) -> str | None
         "password": password,
     }
 
-    with psycopg2.connect(**conn_params) as conn:
+    with psycopg2.connect(conn_params) as conn:
         with conn.cursor() as cur:
             # cur = conn_params.cursor()
             try:
