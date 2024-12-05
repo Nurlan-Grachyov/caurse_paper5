@@ -4,8 +4,6 @@ from abc import ABC, abstractmethod
 import psycopg2
 from dotenv import load_dotenv
 
-# from typing import Dict
-
 
 class DBConnect(ABC):
     """Абстрактный метод"""
@@ -77,7 +75,6 @@ class DBManager(DBConnect):
         salary: int | None = None,
         url: str | None = None,
     ):
-        pass
         query = """
                 SELECT * FROM vacancies
                 WHERE (%s IS NULL OR employer ILIKE %s)

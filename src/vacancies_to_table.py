@@ -11,38 +11,38 @@ def employers_to_table(employers: List[dict[str, Optional[str]]]):
     """Функция, добавляющая работодателей в таблицу"""
     load_dotenv()
     password = os.getenv("DATABASE_PASSWORD")
-    conn_params = psycopg2.connect(
-        host="localhost",
-        database="vacancies",
-        user="postgres",
-        password=password,
-    )
+    conn_params = {
+        "host": "localhost",
+        "database": "vacancies",
+        "user": "postgres",
+        "password": password,
+    }
 
-    cur = conn_params.cursor()
-    try:
-        cur.execute("DROP TABLE IF EXISTS employers CASCADE;")
-        cur.execute(
-            "CREATE TABLE employers (employer varchar(100) PRIMARY KEY not null,"
-            "open_vacancies varchar(100))"
-        )
+    with psycopg2.connect(**conn_params) as conn:  # type: ignore
+        with conn.cursor() as cur:
+            try:
+                cur.execute("DROP TABLE IF EXISTS employers CASCADE;")
+                cur.execute(
+                    "CREATE TABLE employers (employer varchar(100) PRIMARY KEY not null,"
+                    "open_vacancies varchar(100))"
+                )
 
-        for employer in employers:
-            name_employer = employer["name"]
-            open_vacancies = employer["open_vacancies"]
-            cur.execute(
-                "INSERT INTO employers VALUES (%s, %s)",
-                (name_employer, open_vacancies),
-            )
-        conn_params.commit()
-        cur.close()
-        conn_params.close()
-        return "Работодатели добавлены в таблицу"
-    except Exception as e:
-        print(e)
-        return "Ошибка в employers_to_table"
+                for employer in employers:
+                    name_employer = employer["name"]
+                    open_vacancies = employer["open_vacancies"]
+                    cur.execute(
+                        "INSERT INTO employers VALUES (%s, %s)",
+                        (name_employer, open_vacancies),
+                    )
+
+                conn.commit()
+
+                return "Работодатели добавлены в таблицу"
+            except Exception as e:
+                print(e)
+                return "Ошибка в employers_to_table"
 
 
-# def vacancies_to_table(vacancies: List[Dict[str, Optional[dict]]]) -> str | None:
 def vacancies_to_table(vacancies: List[Dict[str, dict]]) -> str | None:
     """Функция, добавляющая вакансии в таблицу"""
     load_dotenv()
@@ -54,9 +54,8 @@ def vacancies_to_table(vacancies: List[Dict[str, dict]]) -> str | None:
         "password": password,
     }
 
-    with psycopg2.connect(conn_params) as conn:
+    with psycopg2.connect(**conn_params) as conn:  # type: ignore
         with conn.cursor() as cur:
-            # cur = conn_params.cursor()
             try:
                 cur.execute("DROP TABLE IF EXISTS vacancies;")
                 cur.execute(
@@ -96,8 +95,7 @@ def vacancies_to_table(vacancies: List[Dict[str, dict]]) -> str | None:
                         ),
                     )
                 conn.commit()
-                # cur.close()
-                # conn_params.close()
+
                 return "Вакансии добавлены в таблицу"
             except Exception as e:
                 print(e)
