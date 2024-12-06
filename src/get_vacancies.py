@@ -10,7 +10,7 @@ def get_employers():
     try:
         employer_json = requests.get(url_1, params=params)
         if employer_json.status_code == 200:
-            employers = employer_json.json().get("items")[:11]
+            employers = employer_json.json().get("items")[:10]
             return employers
     except Exception as e:
         print(e)
@@ -37,6 +37,7 @@ def get_vacancies(employers: List) -> List:
                         and vacancy["salary"].get("currency") is not None
                         and vacancy.get("alternate_url") is not None
                         and vacancy["employer"].get("name") is not None
+                        and vacancy["salary"]["currency"] == "RUR"
                     ):
                         all_vacancies.append(vacancy)
         return all_vacancies
@@ -47,5 +48,5 @@ def get_vacancies(employers: List) -> List:
 
 
 if __name__ == "__main__":
-    # print(get_vacancies(get_employers()))
-    print(get_employers())
+    for vac in get_vacancies(get_employers()):
+        print(vac)
