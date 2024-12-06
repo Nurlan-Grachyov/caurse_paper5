@@ -80,7 +80,9 @@ class DBManager(DBConnect):
                 SELECT * FROM vacancies
                 WHERE (%s IS NULL OR employer ILIKE %s)
                 AND (%s IS NULL OR name_vacancy ILIKE %s)
-                AND (%s IS NULL OR %s BETWEEN salary_from AND salary_to)
+                AND (%s IS NULL OR 
+               (salary_to = 0 AND %s >= salary_from) OR 
+               (salary_from IS NOT NULL AND salary_to IS NOT NULL AND %s BETWEEN salary_from AND salary_to))
                 AND (%s IS NULL OR url = %s);
                 """
         params = (
