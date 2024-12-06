@@ -36,7 +36,7 @@ class DBManager(DBConnect):
         pass
 
     @staticmethod
-    def __connect_to_database(query: str, params: tuple | None = None) -> list:
+    def connect_to_database(query: str, params: tuple | None = None) -> list:
         """Подключаемся к базе данных"""
         load_dotenv()
         password = os.getenv("DATABASE_PASSWORD")
@@ -57,17 +57,15 @@ class DBManager(DBConnect):
         return results
 
     def get_companies_and_vacancies_count(self):
-        """Метод для получения списка всех компаний и количества вакансий у каждой компании(сохраняется в таблицу)"""
+        """Метод для получения списка всех компаний и количества вакансий у каждой компании"""
         query = """
                 SELECT vacancies.employer, employers.open_vacancies FROM vacancies
                 JOIN employers ON vacancies.employer = employers.employer
                 GROUP BY vacancies.employer, employers.open_vacancies
                 """
-        results = self.__connect_to_database(query)
-        for row in results:
-            print(
-                f"Компания: {row[0]}, Вакансия: {row[1]}, Зарплата: {row[2]}, URL: {row[3]}"
-            )
+        results = self.connect_to_database(query)
+        return results
+
 
     def get_all_vacancies(
         self,
@@ -95,7 +93,7 @@ class DBManager(DBConnect):
             url,
             url,
         )
-        results = self.__connect_to_database(query, params)
+        results = self.connect_to_database(query, params)
         vacancies = []
         for row in results:
             vacancies.append(
@@ -111,7 +109,7 @@ class DBManager(DBConnect):
     def get_avg_salary(self):
         """Метод, получающий среднюю зарплату по вакансиям."""
         query = "SELECT round(AVG(salary_from), 2) AS avg_salary FROM vacancies"
-        results = self.__connect_to_database(query)
+        results = self.connect_to_database(query)
         avg_salary = results[0][0] if results and results[0] else None
         return avg_salary
 
@@ -120,7 +118,7 @@ class DBManager(DBConnect):
         query = """SELECT * FROM vacancies
         WHERE (salary_from + salary_to) / 2 > (SELECT round(AVG((salary_from + salary_to) / 2), 2)
         AS AVG_SALARY FROM vacancies)"""
-        results = self.__connect_to_database(query)
+        results = self.connect_to_database(query)
         vacancies = []
         for row in results:
             vacancies.append(
@@ -137,23 +135,24 @@ class DBManager(DBConnect):
         """Метод, получающий список всех вакансий,
          в названии которых содержатся переданные в метод слова, например python."""
         query = "SELECT * FROM vacancies WHERE name_vacancy ILIKE '%менеджер%'"
-        results = self.__connect_to_database(query)
+        results = self.connect_to_database(query)
 
         return results
 
 
 if __name__ == "__main__":
     obj = DBManager()
-    print(obj.get_companies_and_vacancies_count())
-    # print(
-    #     obj.get_all_vacancies(
-    #         "001KZ (001КЗ)",
-    #         "Бухгалтер по ЭСФ",
-    #         200000,
-    #         "https://hh.ru/vacancy/111974062",
-    #     )
-    # )
+    # print(obj.get_companies_and_vacancies_count())
+    print(
+        obj.get_all_vacancies(
+            "0250",
+            "Менеджер по продажам",
+            60000,
+            # "https://hh.ru/vacancy/112147530",
+        )
+    )
     # print(obj.get_all_vacancies())
     # print(obj.get_avg_salary())
     # print(obj.get_vacancies_with_higher_salary())
     # print(obj.get_vacancies_with_keyword())
+    # print(obj.connect_to_database("SELECT * FROM vacancies"))
