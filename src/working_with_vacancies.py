@@ -65,7 +65,6 @@ class DBManager(DBConnect):
                 GROUP BY vacancies.employer, employers.open_vacancies
                 """
         results = self.connect_to_database(query)
-        print(type(results))
         return results
 
     def get_all_vacancies(self) -> list[dict[str, str]]:
