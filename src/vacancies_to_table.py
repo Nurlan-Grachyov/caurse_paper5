@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from src.get_vacancies import get_employers, get_vacancies
 
 
-def create_database():
+def create_database() -> None:
     load_dotenv()
 
     password = os.getenv("DATABASE_PASSWORD")
@@ -28,16 +28,14 @@ def create_database():
         if not exists:
             cur.execute("CREATE DATABASE vacancies")
             print("База данных vacancies успешно создана.")
-    except Exception:
-        print("Не удалось создать базу данных")
+    except psycopg2.DatabaseError as e:
+        print("Не удалось создать базу данных", e)
     finally:
         cur.close()
         conn.close()
 
-    # print('Не получилось создать базу данных')
 
-
-def employers_to_table(employers: List[dict[str, Optional[str]]]):
+def employers_to_table(employers: List[dict[str, Optional[str]]]) -> str:
     """Функция, добавляющая работодателей в таблицу"""
     create_database()
     load_dotenv()

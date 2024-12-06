@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 
 class DBConnect(ABC):
-    """Абстрактный метод"""
+    """Абстрактный метод, который обязывает дочерний класс использовать данные методы"""
 
     @abstractmethod
     def get_companies_and_vacancies_count(self):
@@ -32,8 +32,8 @@ class DBConnect(ABC):
 class DBManager(DBConnect):
     """Класс для работы с вакансиями из таблицы"""
 
-    def __init__(self):
-        pass
+    def __init__(self, word):
+        self.word = word
 
     @staticmethod
     def connect_to_database(query: str, params: tuple | None = None) -> list:
@@ -64,38 +64,15 @@ class DBManager(DBConnect):
                 GROUP BY vacancies.employer, employers.open_vacancies
                 """
         results = self.connect_to_database(query)
+        print(type(results))
         return results
 
-    def get_all_vacancies(
-        self,
-        company: str | None = None,
-        vacancy: str | None = None,
-        salary: int | None = None,
-        url: str | None = None,
-    ):
+    def get_all_vacancies(self) -> list[dict[str, str]]:
         """Метод для получения списка всех вакансий с указанием названия компании,
         названия вакансии и зарплаты и ссылки на вакансию."""
-        query = """
-                SELECT * FROM vacancies
-                WHERE (company IS NULL OR employer ILIKE %s)
-                AND (%s IS NULL OR name_vacancy ILIKE %s)
-                AND (%s IS NULL OR (salary_to = 0 AND %s >= salary_from) OR
-                (salary_from IS NOT NULL AND salary_to IS NOT NULL AND %s BETWEEN salary_from AND salary_to))
-                AND (%s IS NULL OR url = %s);
-                """
-        "AND (%s IS NULL OR %s BETWEEN salary_from AND salary_to)"
+        query = "SELECT * FROM vacancies"
 
-        params = (
-            company,
-            f"%{company}%",
-            vacancy,
-            f"%{vacancy}%",
-            salary,
-            salary,
-            url,
-            url,
-        )
-        results = self.connect_to_database(query, params)
+        results = self.connect_to_database(query)
         vacancies = []
         for row in results:
             vacancies.append(
@@ -108,11 +85,11 @@ class DBManager(DBConnect):
             )
         return vacancies
 
-    def get_avg_salary(self):
+    def get_avg_salary(self) -> str:
         """Метод, получающий среднюю зарплату по вакансиям."""
         query = (
             "SELECT round(AVG(salary_from),2) AS avg_salary_to, "
-            "round(AVG(salary_to), 2) AS avg_salary_from FROM vacancies"
+            "round(AVG(salary_to), 2) AS avg_salary_from FROM vacancies "
             "WHERE salary_to > 0 and salary_from > 0"
         )
         results = self.connect_to_database(query)
@@ -120,7 +97,7 @@ class DBManager(DBConnect):
         avg_salary_to = results[0][1] if results and results[0] else None
         return f"Средняя зарплата от равна {float(avg_salary_from)}, до - {float(avg_salary_to)}"
 
-    def get_vacancies_with_higher_salary(self):
+    def get_vacancies_with_higher_salary(self) -> list[dict[str, str]]:
         """Метод, получающий список всех вакансий, у которых зарплата выше средней по всем вакансиям."""
         query = """SELECT * FROM vacancies
         WHERE (salary_from + salary_to) / 2 > (SELECT round(AVG((salary_from + salary_to) / 2), 2)
@@ -138,28 +115,30 @@ class DBManager(DBConnect):
             )
         return vacancies
 
-    def get_vacancies_with_keyword(self, word: str | None = None):
+    def get_vacancies_with_keyword(self) -> list[dict[str, str]]:
         """Метод, получающий список всех вакансий,
         в названии которых содержатся переданные в метод слова, например python."""
-        query = f"SELECT * FROM vacancies WHERE name_vacancy ILIKE '%{word}%'"
+        query = f"SELECT * FROM vacancies WHERE name_vacancy ILIKE '%{self.word}%'"
         results = self.connect_to_database(query)
-
-        return results
+        vacancies = []
+        for row in results:
+            vacancies.append(
+                {
+                    "Компания": row[1],
+                    "Вакансия": row[0],
+                    "Зарплата": row[3],
+                    "URL": row[6],
+                }
+            )
+        return vacancies
 
 
 if __name__ == "__main__":
-    obj = DBManager()
-    # print(obj.get_companies_and_vacancies_count())
-    # print(
-    #     obj.get_all_vacancies(
-    #         "0250",
-    #         "Менеджер по продажам",
-    #         60000,
-    #         "https://hh.ru/vacancy/112147530",
-    #     )
-    # )
-    # print(obj.get_all_vacancies())
-    # print(obj.get_avg_salary())
-    # print(obj.get_vacancies_with_higher_salary())
-    print(obj.get_vacancies_with_keyword("менеджер"))
-    # print(obj.connect_to_database("SELECT * FROM vacancies"))
+    obj = DBManager("менеджер")
+    print(obj.get_companies_and_vacancies_count())
+    print(obj.get_all_vacancies())
+    print(obj.get_all_vacancies())
+    print(obj.get_avg_salary())
+    print(obj.get_vacancies_with_higher_salary())
+    print(obj.get_vacancies_with_keyword())
+    print(obj.connect_to_database("SELECT * FROM vacancies"))

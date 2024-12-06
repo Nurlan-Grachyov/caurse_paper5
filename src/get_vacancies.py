@@ -1,9 +1,9 @@
-from typing import List
+from typing import Any
 
 import requests
 
 
-def get_employers():
+def get_employers() -> list[dict[str, Any]]:
     """Функция, получающая работодателей по API"""
     url_1 = "https://api.hh.ru/employers"
     params = {"only_with_vacancies": True}
@@ -12,13 +12,16 @@ def get_employers():
         if employer_json.status_code == 200:
             employers = employer_json.json().get("items")[:10]
             return employers
+        else:
+            print(f"Ошибка: статус {employer_json.status_code}")
+            return []
     except Exception as e:
         print(e)
         print("Ошибка в get_vacancies")
         return []
 
 
-def get_vacancies(employers: List) -> List:
+def get_vacancies(employers: list) -> list:
     """Функция, получающая вакансии у этих работодателей по API"""
     try:
         all_vacancies = []
