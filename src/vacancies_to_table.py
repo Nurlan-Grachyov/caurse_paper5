@@ -8,6 +8,7 @@ from src.get_vacancies import get_employers, get_vacancies
 
 
 def create_database() -> None:
+    """Создаем базу данных"""
     load_dotenv()
 
     password = os.getenv("DATABASE_PASSWORD")

@@ -10,23 +10,29 @@ class DBConnect(ABC):
 
     @abstractmethod
     def get_companies_and_vacancies_count(self):
-
+        """Метод для получения списка всех компаний и количества вакансий у каждой компании"""
         pass
 
     @abstractmethod
     def get_all_vacancies(self):
+        """Метод для получения списка всех вакансий с указанием названия компании,
+        названия вакансии и зарплаты и ссылки на вакансию."""
         pass
 
     @abstractmethod
     def get_avg_salary(self):
+        """Метод, получающий среднюю зарплату по вакансиям."""
         pass
 
     @abstractmethod
     def get_vacancies_with_higher_salary(self):
+        """Метод, получающий список всех вакансий, у которых зарплата выше средней по всем вакансиям."""
         pass
 
     @abstractmethod
     def get_vacancies_with_keyword(self):
+        """Метод, получающий список всех вакансий,
+        в названии которых содержатся переданные в метод слова, например python."""
         pass
 
 
