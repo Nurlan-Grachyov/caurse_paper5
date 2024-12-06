@@ -10,6 +10,7 @@ class DBConnect(ABC):
 
     @abstractmethod
     def get_companies_and_vacancies_count(self):
+
         pass
 
     @abstractmethod
@@ -32,7 +33,7 @@ class DBConnect(ABC):
 class DBManager(DBConnect):
     """Класс для работы с вакансиями из таблицы"""
 
-    def __init__(self, word):
+    def __init__(self, word: str):
         self.word = word
 
     @staticmethod
@@ -56,7 +57,7 @@ class DBManager(DBConnect):
         conn.close()
         return results
 
-    def get_companies_and_vacancies_count(self):
+    def get_companies_and_vacancies_count(self) -> list:
         """Метод для получения списка всех компаний и количества вакансий у каждой компании"""
         query = """
                 SELECT vacancies.employer, employers.open_vacancies FROM vacancies
