@@ -7,8 +7,39 @@ from dotenv import load_dotenv
 from src.get_vacancies import get_employers, get_vacancies
 
 
+def create_database():
+    load_dotenv()
+
+    password = os.getenv("DATABASE_PASSWORD")
+    host = "localhost"
+    port = "5432"
+    user = "postgres"
+    database = "postgres"
+
+    conn = psycopg2.connect(
+        host=host, port=port, user=user, password=password, database=database
+    )
+    conn.autocommit = True
+
+    cur = conn.cursor()
+    cur.execute("SELECT 1 FROM pg_database WHERE datname = 'vacancies';")
+    exists = cur.fetchone()
+    try:
+        if not exists:
+            cur.execute("CREATE DATABASE vacancies")
+            print("База данных vacancies успешно создана.")
+    except Exception:
+        print("Не удалось создать базу данных")
+    finally:
+        cur.close()
+        conn.close()
+
+    # print('Не получилось создать базу данных')
+
+
 def employers_to_table(employers: List[dict[str, Optional[str]]]):
     """Функция, добавляющая работодателей в таблицу"""
+    create_database()
     load_dotenv()
     password = os.getenv("DATABASE_PASSWORD")
     conn_params = {
@@ -35,8 +66,6 @@ def employers_to_table(employers: List[dict[str, Optional[str]]]):
                         (name_employer, open_vacancies),
                     )
 
-                conn.commit()
-
                 return "Работодатели добавлены в таблицу"
             except Exception as e:
                 print(e)
@@ -45,6 +74,7 @@ def employers_to_table(employers: List[dict[str, Optional[str]]]):
 
 def vacancies_to_table(vacancies: List[Dict[str, dict]]) -> str | None:
     """Функция, добавляющая вакансии в таблицу"""
+    create_database()
     load_dotenv()
     password = os.getenv("DATABASE_PASSWORD")
     conn_params = {
@@ -94,7 +124,6 @@ def vacancies_to_table(vacancies: List[Dict[str, dict]]) -> str | None:
                             url_vacancy,
                         ),
                     )
-                conn.commit()
 
                 return "Вакансии добавлены в таблицу"
             except Exception as e:

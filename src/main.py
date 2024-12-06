@@ -1,8 +1,8 @@
-from src.get_vacancies import get_vacancies, get_employers
-from src.vacancies_to_table import vacancies_to_table, employers_to_table
+from src.get_vacancies import get_employers, get_vacancies
+from src.vacancies_to_table import employers_to_table, vacancies_to_table
 from src.working_with_vacancies import DBManager
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(get_vacancies(get_employers()))
     print(employers_to_table(get_employers()))
     print(vacancies_to_table(get_vacancies(get_employers())))
@@ -20,3 +20,7 @@ if __name__ == '__main__':
     print(obj.get_avg_salary())
     print(obj.get_vacancies_with_higher_salary())
     print(obj.get_vacancies_with_keyword())
+# Код для создания БД вызывается в основном скрипте программы.
+# Код для создания таблиц в БД вызывается в основном скрипте программы.
+# solid
+# get_all_vacancies

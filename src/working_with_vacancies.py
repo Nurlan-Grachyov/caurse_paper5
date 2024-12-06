@@ -66,7 +66,6 @@ class DBManager(DBConnect):
         results = self.connect_to_database(query)
         return results
 
-
     def get_all_vacancies(
         self,
         company: str | None = None,
@@ -75,16 +74,17 @@ class DBManager(DBConnect):
         url: str | None = None,
     ):
         """Метод для получения списка всех вакансий с указанием названия компании,
-         названия вакансии и зарплаты и ссылки на вакансию."""
+        названия вакансии и зарплаты и ссылки на вакансию."""
         query = """
                 SELECT * FROM vacancies
-                WHERE (%s IS NULL OR employer ILIKE %s)
+                WHERE (company IS NULL OR employer ILIKE %s)
                 AND (%s IS NULL OR name_vacancy ILIKE %s)
-                AND (%s IS NULL OR 
-               (salary_to = 0 AND %s >= salary_from) OR 
-               (salary_from IS NOT NULL AND salary_to IS NOT NULL AND %s BETWEEN salary_from AND salary_to))
+                AND (%s IS NULL OR (salary_to = 0 AND %s >= salary_from) OR
+                (salary_from IS NOT NULL AND salary_to IS NOT NULL AND %s BETWEEN salary_from AND salary_to))
                 AND (%s IS NULL OR url = %s);
                 """
+        "AND (%s IS NULL OR %s BETWEEN salary_from AND salary_to)"
+
         params = (
             company,
             f"%{company}%",
@@ -110,10 +110,15 @@ class DBManager(DBConnect):
 
     def get_avg_salary(self):
         """Метод, получающий среднюю зарплату по вакансиям."""
-        query = "SELECT round(AVG(salary_from), 2) AS avg_salary FROM vacancies"
+        query = (
+            "SELECT round(AVG(salary_from),2) AS avg_salary_to, "
+            "round(AVG(salary_to), 2) AS avg_salary_from FROM vacancies"
+            "WHERE salary_to > 0 and salary_from > 0"
+        )
         results = self.connect_to_database(query)
-        avg_salary = results[0][0] if results and results[0] else None
-        return avg_salary
+        avg_salary_from = results[0][0] if results and results[0] else None
+        avg_salary_to = results[0][1] if results and results[0] else None
+        return f"Средняя зарплата от равна {float(avg_salary_from)}, до - {float(avg_salary_to)}"
 
     def get_vacancies_with_higher_salary(self):
         """Метод, получающий список всех вакансий, у которых зарплата выше средней по всем вакансиям."""
@@ -133,10 +138,10 @@ class DBManager(DBConnect):
             )
         return vacancies
 
-    def get_vacancies_with_keyword(self):
+    def get_vacancies_with_keyword(self, word: str | None = None):
         """Метод, получающий список всех вакансий,
-         в названии которых содержатся переданные в метод слова, например python."""
-        query = "SELECT * FROM vacancies WHERE name_vacancy ILIKE '%менеджер%'"
+        в названии которых содержатся переданные в метод слова, например python."""
+        query = f"SELECT * FROM vacancies WHERE name_vacancy ILIKE '%{word}%'"
         results = self.connect_to_database(query)
 
         return results
@@ -145,16 +150,16 @@ class DBManager(DBConnect):
 if __name__ == "__main__":
     obj = DBManager()
     # print(obj.get_companies_and_vacancies_count())
-    print(
-        obj.get_all_vacancies(
-            "0250",
-            "Менеджер по продажам",
-            60000,
-            # "https://hh.ru/vacancy/112147530",
-        )
-    )
+    # print(
+    #     obj.get_all_vacancies(
+    #         "0250",
+    #         "Менеджер по продажам",
+    #         60000,
+    #         "https://hh.ru/vacancy/112147530",
+    #     )
+    # )
     # print(obj.get_all_vacancies())
     # print(obj.get_avg_salary())
     # print(obj.get_vacancies_with_higher_salary())
-    # print(obj.get_vacancies_with_keyword())
+    print(obj.get_vacancies_with_keyword("менеджер"))
     # print(obj.connect_to_database("SELECT * FROM vacancies"))
